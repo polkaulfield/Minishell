@@ -17,5 +17,8 @@ typedef struct s_galloc
 	struct s_galloc	*start;
 }	t_galloc;
 
+void	free_galloc(t_galloc *l_galloc);
+void	*add_galloc(void *mem, t_galloc *l_galloc);
+void	*galloc(size_t size, t_galloc *l_galloc);
 
 #endif
