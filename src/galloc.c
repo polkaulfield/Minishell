@@ -27,7 +27,7 @@ void	*add_galloc(void *mem, t_galloc *l_galloc)
 		return (NULL);
 	new_node = malloc(sizeof(t_galloc));
 	if (!new_node)
-		; // implement terminate();s
+		printf("Terminate()"); // implement terminate();
 	new_node->mem = mem;
 	new_node->next = NULL;
 	new_node->start = l_galloc->start;
@@ -52,10 +52,10 @@ void	*galloc(size_t size, t_galloc *l_galloc)
 	}
 	new_node = malloc(sizeof(t_galloc));
 	if (!new_node)
-		; // implement terminate();
+		printf("\"Terminate()\""); // implement terminate();
 	mem = malloc(sizeof(size));
 	if (!mem)
-		; // implement terminate();
+		printf("\"Terminate()\""); // implement terminate();
 	new_node->mem = mem;
 	new_node->next = NULL;
 	new_node->start = l_galloc->start;

@@ -1,22 +1,14 @@
 #include "../includes/minishell.h"
 
-char	*ft_idk(char *src, char c)
+// strlen till the char
+int	ft_lentoc(const char *str, char c)
 {
-	char	*str;
-	int		i;
+	int	i;
 
-	i = -1;
-	src++;
-	while (src[++i] && src[i] != c)
-		;
-	str = malloc((i + 1) * sizeof(char));
-	if (!str)
-		return (NULL);
-	i = -1;
-	while (src[++i] && src[i] != c)
-		str[i] = src[i];
-	str[i] = '\0';
-	return (str);
+	i = 0;
+	while (str[i] && str[i] != c)
+		i++;
+	return (i);
 }
 
 char	*user_finder(char *user, char *pc, t_galloc *l_galloc)
@@ -27,8 +19,10 @@ char	*user_finder(char *user, char *pc, t_galloc *l_galloc)
 	pc = "?";
 	if (l_galloc)
 		;
-	user = ft_idk(strchr(getenv("SESSION_MANAGER"), '='), '\0');
-	pc = ft_idk(strchr(getenv("LOGNAME"), '/'), ':');
+	user = ft_substr(getenv("USERNAME"), 0, ft_strlen(getenv("USERNAME")));
+	pc = ft_strchr(getenv("SESSION_MANAGER"), '/');
+	pc++;
+	pc = ft_substr(pc, 0, ft_lentoc(pc, ':'));
 	if (!user)
 		user = "?";
 	if (!pc)
@@ -44,13 +38,13 @@ char	*path_finder(char *path, t_galloc *l_galloc)
 	char	*line_path;
 
 	path = NULL;
-	path = strchr(getenv("PWD"), '=');
+	path = getenv("PWD");
 	if (!path)
 		return ("?");
 	line_path = galloc((strlen(path) + 1) * sizeof(char), l_galloc);
 	if (!line_path)
 		return ("?");
-	ft_strlcpy(line_path, path, ft_strlen(path) + 1);
+	line_path = ft_substr(path, 0, ft_strlen(path) + 1);
 	return (line_path);
 }
 
@@ -62,10 +56,9 @@ char	*line_finder(t_galloc *l_galloc)
 
 	line_user = user_finder(getenv("LOGNAME"), getenv("SESSION_MANAGER"), l_galloc);
 	line_path = path_finder("PWD", l_galloc);
-	line = galloc((strlen(line_user) + strlen(line_path) + 5) * sizeof(char), l_galloc);
+	line = ft_strjoin(line_user, ft_strjoin(":", ft_strjoin(line_path, "$\n>")));
 	if (!line)
 		return ("?$\n>");
-	line = ft_strjoin(line_user, ft_strjoin(":", ft_strjoin(line_path, "$\n>")));
 	return (line);
 }
 

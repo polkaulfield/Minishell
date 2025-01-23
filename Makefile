@@ -5,31 +5,42 @@ FLAGS = -Wall -Wextra -Werror -g
 LIBFTDIR = libft/
 OBJ_DIR = obj/
 
-SRC = src/*.c
-
+# Source files
+SRC = $(wildcard src/*.c)
+# Object files (placed in OBJ_DIR)
 OBJ = ${SRC:.c=.o}
 
-INCLUDE = -L ./libft -lft -lreadline
+# Include and library paths
+INCLUDES = -I includes -I $(LIBFTDIR)
+LIBS = -L $(LIBFTDIR) -lft -lreadline
 
-%.o: %.c Makefile includes/minishell.h libft/libft.a
-			${CC} ${FLAGS} -c $< -o ${<:.c=.o}
+# Ensure OBJ_DIR exists
+$(OBJ_DIR):
+	@mkdir -p $(OBJ_DIR)
 
-all: make_libs ${NAME}
+# Rule to compile object files
+$(OBJ_DIR)%.o: src/%.c includes/minishell.h libft/libft.a | $(OBJ_DIR)
+	$(CC) $(FLAGS) $(INCLUDES) -c $< -o $@
 
+# Build libft
 make_libs:
-	make -C $(LIBFTDIR)
+	@make -C $(LIBFTDIR)
 
-${NAME}: ${OBJ}
-			${CC} ${FLAGS} ${OBJ} -o ${NAME} ${INCLUDE}
+# Build minishell
+all: make_libs $(NAME)
 
+$(NAME): $(OBJ)
+	$(CC) $(FLAGS) $(OBJ) -o $(NAME) $(LIBS)
+
+# Clean up
 clean:
-		${RM} ${OBJ}
-		@cd $(LIBFTDIR) && $(MAKE) clean
+	$(RM) $(OBJ)
+	@make -C $(LIBFTDIR) clean
 
 fclean: clean
-		${RM} ${NAME}
-		@cd $(LIBFTDIR) && $(MAKE) fclean
+	$(RM) $(NAME)
+	@make -C $(LIBFTDIR) fclean
 
-re: clean all
+re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all make_libs clean fclean re
