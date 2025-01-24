@@ -1,4 +1,10 @@
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
+
+void	terminate(t_sh *sh)
+{
+	free_galloc(sh);
+	free(sh);
+}
 
 void	free_galloc(t_sh *sh)
 {

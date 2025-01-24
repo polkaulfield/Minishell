@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 // strlen till the char
 int	ft_lentoc(const char *str, char c)

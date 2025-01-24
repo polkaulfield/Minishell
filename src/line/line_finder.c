@@ -1,4 +1,4 @@
-#include "../includes/minishell.h"
+#include "../../includes/minishell.h"
 
 char	*linejoin(char *user, char *path, t_sh *sh)
 {
@@ -13,7 +13,7 @@ char	*linejoin(char *user, char *path, t_sh *sh)
 	if (!path)
 		path = "?";
 	div1 = ":";
-	div2 = "$\n>";
+	div2 = "$\n> ";
 	line = galloc((ft_strlen(user) + ft_strlen(div1) + ft_strlen(path) + ft_strlen(div2) + 1) * sizeof(char), sh);
 	i = -1;
 	j = -1;
@@ -115,7 +115,7 @@ char	*line_finder(t_sh *sh)
 
 	line = linejoin(line_user, line_path, sh);
 	if (!line)
-		return ("?$\n>");
+		return ("?$\n> ");
 
 	return (line);
 }
