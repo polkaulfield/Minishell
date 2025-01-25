@@ -49,13 +49,26 @@ int	cmd_cmp(char *input, t_sh *sh)
 		check_in_out_file(input, sh);
 	else if (ft_strncmp(input, "|", 2) == 0)
 	{
-		sh->cmd_list->out_pipe = 1;
-		cmd_addnode(sh);
-		if (pipe(sh->cmd_list->fd_pipe) < 0)
+		/*if (pipe(fd_pipe) < 0)
 		{
 			printf("pipe error\n");
 			terminate (sh);
-		}
+		}*/
+		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
+		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
+		//printf ("%i %i\n", fd_pipe[0], fd_pipe[1]);
+		//sh->cmd_list->fd_pipe = fd_pipe;
+		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
+		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
+		//printf("--%i\n", fd_pipe[1]);
+		sh->cmd_list->out_pipe = 1;
+		cmd_addnode(sh);
+		pipe(sh->cmd_list->fd_pipe);
+		//sh->cmd_list->fd_pipe[0] = fd_pipe[0];
+		//sh->cmd_list->fd_pipe[1] = fd_pipe[1];
+	//	printf ("%i %i\n", fd_pipe[0], fd_pipe[1]);
+		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
+		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
 		sh->cmd_list->in_pipe = 1;
 	}
 	else if (sh->cmd_list->f_next_infile)

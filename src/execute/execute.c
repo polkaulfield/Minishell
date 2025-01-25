@@ -47,21 +47,24 @@ void	prepare_pipe(t_sh *sh)
 {
 	if (sh->cmd_list->out_pipe)
 	{
-		printf("in\n");
+		//printf("in\n");
+
+		dup2(sh->cmd_list->next->fd_pipe[0], STDOUT_FILENO);
 		close(sh->cmd_list->next->fd_pipe[0]);
-		printf("in ---\n");
-		dup2(sh->cmd_list->next->fd_pipe[1], STDOUT_FILENO);
-		printf("in ---\n");
 		close(sh->cmd_list->next->fd_pipe[1]);
-		printf("in ---\n");
+		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
+		printf("in.\n");
+		exit(1);
 	}
 	if (sh->cmd_list->in_pipe)
 	{
-		printf("out\n");
+		//printf("out\n");
+
+		dup2(sh->cmd_list->fd_pipe[1], STDIN_FILENO);
 		close(sh->cmd_list->fd_pipe[1]);
-		dup2(sh->cmd_list->fd_pipe[0], STDIN_FILENO);
 		close(sh->cmd_list->fd_pipe[0]);
-		printf("out ---\n");
+		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
+		//printf("out.\n");
 	}
 }
 
@@ -83,7 +86,7 @@ void	excute(t_sh *sh)
 		if (sh->cmd_list->outfile)
 			out_file(sh);
 		prepare_pipe(sh);
-		printf("exec\n");
+		//printf("exec\n");
 		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
 		printf("minishell: Command not Found\n");
 		exit(1);
