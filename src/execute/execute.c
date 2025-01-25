@@ -1,19 +1,76 @@
 #include "../../includes/minishell.h"
 
-/*char	**path_execute(char *cmd, t_sh *sh)
+
+
+void	in_file(t_sh *sh)
 {
-	char	**cmd;
+	sh->cmd_list->fd_in = open(sh->cmd_list->infile, O_RDONLY);
+	if (sh->cmd_list->fd_in < 0)
+	{
+		printf("infile error\n");
+		exit(1);
+	}
+	dup2(sh->cmd_list->fd_in, STDIN_FILENO);
+	close(sh->cmd_list->fd_in);
+}
 
+void	out_file(t_sh *sh)
+{
+	sh->cmd_list->fd_out = open(sh->cmd_list->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (sh->cmd_list->fd_out < 0)
+	{
+		printf("outfile error\n");
+		exit(1);
+	}
+	dup2(sh->cmd_list->fd_out, STDOUT_FILENO);
+	close(sh->cmd_list->fd_out);
+}
 
-}*/
+t_cmd	*fork_create(t_sh *sh)
+{
+	t_cmd	*cmd;
 
-void	in_file(t_sh)
+	sh->cmd_list = sh->cmd_list->start;
+	cmd = sh->cmd_list;
+	while (cmd)
+	{
+		cmd->pid = fork();
+		if (cmd->pid)
+			cmd = cmd->next;
+		else
+			return (cmd);
+	}
+	return (sh->cmd_list);
+}
 
+void	prepare_pipe(t_sh *sh)
+{
+	if (sh->cmd_list->out_pipe)
+	{
+		printf("in\n");
+		close(sh->cmd_list->next->fd_pipe[0]);
+		printf("in ---\n");
+		dup2(sh->cmd_list->next->fd_pipe[1], STDOUT_FILENO);
+		printf("in ---\n");
+		close(sh->cmd_list->next->fd_pipe[1]);
+		printf("in ---\n");
+	}
+	if (sh->cmd_list->in_pipe)
+	{
+		printf("out\n");
+		close(sh->cmd_list->fd_pipe[1]);
+		dup2(sh->cmd_list->fd_pipe[0], STDIN_FILENO);
+		close(sh->cmd_list->fd_pipe[0]);
+		printf("out ---\n");
+	}
+}
 
+//cmd = path_execute(sh->cmd_list->cmd, sh);
+	//sh->cmd_list->pid = fork();
 void	excute(t_sh *sh)
 {
-	//cmd = path_execute(sh->cmd_list->cmd, sh);
-	sh->cmd_list->pid = fork();
+	t_cmd	*temp_cmd;
+
 	if (sh->cmd_list->pid == -1)
 	{
 		printf("Fork Error\n");
@@ -21,15 +78,33 @@ void	excute(t_sh *sh)
 	}
 	else if (sh->cmd_list->pid == 0)
 	{
+		if (sh->cmd_list->infile)
+			in_file(sh);
+		if (sh->cmd_list->outfile)
+			out_file(sh);
+		prepare_pipe(sh);
+		printf("exec\n");
 		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-		printf("Commando not Found\n");
+		printf("minishell: Command not Found\n");
 		exit(1);
 	}
-	int status;
-	sh->cmd_list->pid = wait(&status);
+	sh->cmd_list = sh->cmd_list->start;
+	temp_cmd = sh->cmd_list;
+	int status; // hay que revisar esto, solo uso temporal
+	while (temp_cmd)
+	{
+		temp_cmd->pid = wait(&status);
+		temp_cmd = temp_cmd->next;
+	}
 	//printf("todo bien\n");
 }
 
+/*char	**path_execute(char *cmd, t_sh *sh)
+{
+	char	**cmd;
+
+
+}*/
 
 /*void	free_memory(char **arr)
 {

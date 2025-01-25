@@ -9,8 +9,9 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>
-#include <sys/wait.h>
+# include <sys/wait.h>
 # include <unistd.h>
+# include <fcntl.h>
 # include <sys/time.h>//debug
 
 typedef struct	s_sh
@@ -26,12 +27,16 @@ typedef struct	s_cmd
 {
 	int				pid;
 	int				cmd_count;
-	int				pipes;
+	int				out_pipe;
+	int				in_pipe;
+	int				fd_pipe[2];
 	int				f_next_infile;
-	int				f_next_outfile;
-	int				built_int;
+	int				fd_in;
 	char			*infile;
+	int				f_next_outfile;
+	int				fd_out;
 	char			*outfile;
+	int				built_int;
 	char			**cmd;
 	struct s_cmd	*next;
 	struct s_cmd	*start;
@@ -62,10 +67,13 @@ void	*galloc(size_t size, t_sh *sh);
 //parser.c
 void	parser(char *input, t_sh *sh);
 //execute.h
+void	prepare_pipe(t_sh *sh);
+t_cmd	*fork_create(t_sh *sh);
 void	excute(t_sh *sh);
 //built_ins.c
 int		find_built_int(char *input, t_sh *sh);
-//cmd_init.c
+//cmd_utils.c
+t_cmd	*cmd_addnode(t_sh *sh);
 t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh);
 
 #endif
