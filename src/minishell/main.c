@@ -18,7 +18,10 @@ int	main(int argc, char **argv, char **env)
 	{
 		sh->cmd_list = NULL;
 		//sh->cmd_list->cmd_count = 0;
-		line = line_finder(sh);
+		if (env == NULL)
+			line = "minishell\n> ";
+		else
+			line = line_finder(sh);
 		//input = NULL;  // debugger
 		input = readline(line);
 		if (!input)

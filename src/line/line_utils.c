@@ -1,5 +1,44 @@
 #include "../../includes/minishell.h"
 
+char	*linejoin(char *user, char *path, t_sh *sh)
+{
+	char	*div1;
+	char	*div2;
+	char	*line;
+
+	if (!user)
+		user = "?";
+	if (!path)
+		path = "?";
+	div1 = ":";
+	div2 = "$\n> ";
+	line = galloc((ft_strlen(user) + ft_strlen(div1) + ft_strlen(path) + ft_strlen(div2) + 1) * sizeof(char), sh);
+	line[0] = '\0';
+	ft_strlcat(line, user, ft_strlen(line) + ft_strlen(user) + 1);
+	ft_strlcat(line, div1, ft_strlen(line) + ft_strlen(div1) + 1);
+	ft_strlcat(line, path, ft_strlen(line) + ft_strlen(path) + 1);
+	ft_strlcat(line, div2, ft_strlen(line) + ft_strlen(div2) + 1);
+	return (line);
+}
+
+char	*userjoin(char *user, char *pc, t_sh *sh)
+{
+	char	*div1;
+	char	*line;
+
+	if (!user)
+		user = "?";
+	if (!pc)
+		pc = "?";
+	div1 = "@";
+	line = galloc((ft_strlen(user) + ft_strlen(div1) + ft_strlen(pc) + 1) * sizeof(char), sh);
+	line[0] = '\0';
+	ft_strlcat(line, user, ft_strlen(line) + ft_strlen(user) + 1);
+	ft_strlcat(line, div1, ft_strlen(line) + ft_strlen(div1) + 1);
+	ft_strlcat(line, pc, ft_strlen(line) + ft_strlen(pc) + 1);
+	return (line);
+}
+
 // strlen till the char
 int	ft_lentoc(const char *str, char c)
 {

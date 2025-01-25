@@ -7,22 +7,26 @@
 
 }*/
 
+void	in_file(t_sh)
+
+
 void	excute(t_sh *sh)
 {
-	pid_t	pid;
-	//char	**cmd;
 	//cmd = path_execute(sh->cmd_list->cmd, sh);
-	pid = fork();
-	if (pid == -1)
+	sh->cmd_list->pid = fork();
+	if (sh->cmd_list->pid == -1)
 	{
 		printf("Fork Error\n");
 		terminate(sh);
 	}
-	else if (pid == 0)
+	else if (sh->cmd_list->pid == 0)
 	{
 		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-		printf("son ERROR\n");
+		printf("Commando not Found\n");
+		exit(1);
 	}
+	int status;
+	sh->cmd_list->pid = wait(&status);
 	//printf("todo bien\n");
 }
 

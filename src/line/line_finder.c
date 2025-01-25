@@ -1,66 +1,10 @@
 #include "../../includes/minishell.h"
 
-char	*linejoin(char *user, char *path, t_sh *sh)
-{
-	char	*div1;
-	char	*div2;
-	char	*line;
-	int		i;
-	int		j;
 
-	if (!user)
-		user = "?";
-	if (!path)
-		path = "?";
-	div1 = ":";
-	div2 = "$\n> ";
-	line = galloc((ft_strlen(user) + ft_strlen(div1) + ft_strlen(path) + ft_strlen(div2) + 1) * sizeof(char), sh);
-	i = -1;
-	j = -1;
-	while (user[++i])
-		line[++j] = user[i];
-	i = -1;
-	while (div1[++i])
-		line[++j] = div1[i];
-	i = -1;
-	while (path[++i])
-		line[++j] = path[i];
-	i = -1;
-	while (div2[++i])
-		line[++j] = div2[i];
-	line[++j] = '\0';
-	return (line);
-}
-
-char	*userjoin(char *user, char *pc, t_sh *sh)
-{
-	char	*div1;
-	char	*line;
-	int		i;
-	int		j;
-
-	if (!user)
-		user = "?";
-	if (!pc)
-		pc = "?";
-	div1 = "@";
-	line = galloc((ft_strlen(user) + ft_strlen(div1) + ft_strlen(pc) + 1) * sizeof(char), sh);
-	i = -1;
-	j = -1;
-	while (user[++i])
-		line[++j] = user[i];
-	i = -1;
-	while (div1[++i])
-		line[++j] = div1[i];
-	i = -1;
-	while (pc[++i])
-		line[++j] = pc[i];
-	line[++j] = '\0';
-	return (line);
-}
 
 //ahora el nombre esta recortado de cXrXXsX.42barcelona.com a cXrXsX
 //si se ejecuta en otro pc que no sea de 42 el nombre deberia salir entero
+//da problemas al recortar el nombre del pc y ejecutar en casa, dejo eel nombre entero
 char	*user_finder(char *user, char *pc, t_sh *sh)
 {
 	char	*line_user;
@@ -69,7 +13,7 @@ char	*user_finder(char *user, char *pc, t_sh *sh)
 	add_galloc(user, sh);
 	pc = ft_strchr(getenv("SESSION_MANAGER"), '/');
 	pc++;
-	pc = ft_substr(pc, 0, ft_lentoc(pc, '.'));
+	pc = ft_substr(pc, 0, ft_lentoc(pc, ':'));
 	add_galloc(pc, sh);
 	if (!user)
 		user = "?";
@@ -88,10 +32,10 @@ char	*path_finder(char *path, t_sh *sh)
 
 	path = getenv("PWD");
 	if (!path)
-		return ("?");
+		return ("?"); // a lo mejor esto sobra aqui
 	line_path = galloc((strlen(path) + 1) * sizeof(char), sh);
 	if (!line_path)
-		return ("?");
+		return ("?"); // a lo mejor esto sobra aqui
 	line_path = ft_substr(path, 0, ft_strlen(path));
 	add_galloc(line_path, sh);
 	if (ft_strncmp(getenv("HOME"), line_path, ft_strlen(getenv("HOME"))) == 0)

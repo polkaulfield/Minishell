@@ -3,6 +3,7 @@
 int	comand_builder(char *input, t_sh *sh)
 {
 	//printf("%i\n", sh->cmd_list->cmd_count); //debugger
+	printf("%i\n", sh->cmd_list->cmd_count);
 	if (sh->cmd_list->cmd_count == 0)
 	{
 		sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
@@ -10,41 +11,36 @@ int	comand_builder(char *input, t_sh *sh)
 		//necesita buscar la ruta, no debe usar directamente "/bin/"
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
 	}
-	else if (input[0] == '-')
+	else
 	{
 		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
 	}
-	/*else
-	{
-	}*/
-	sh->cmd_list->cmd_count += 1;
-	sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ((void *)0);
 	return (0);
 }
 
+void	check_in_out_file(char *input, t_sh *sh)
+{
+	if (ft_strncmp(input, "<", 2) == 0)
+		sh->cmd_list->f_next_infile = 1;
+	else if (ft_strncmp(input, ">", 2) == 0)
+		sh->cmd_list->f_next_outfile = 1;
+	else if (sh->cmd_list->f_next_infile == 1)
+		sh->cmd_list->infile = ft_strdup(input);
+	else if (sh->cmd_list->f_next_outfile == 1)
+		sh->cmd_list->outfile = ft_strdup(input);
+}
+
 //comand compare
-/*else if (check_built_ins(input, sh))
-		NEED IMPLEMENT*/
 int	cmd_cmp(char *input, t_sh *sh)
 {
-//	static int	cmd_parts = 0;
-	if (ft_strncmp(input, ">", 2) == 0)
-	{
-		printf("> founded\n");
-		sh->cmd_list->f_next_outfile = 1;
-		exit (1);
-	}
-	else if (ft_strncmp(input, "<", 2) == 0)
-	{
-		printf("< founded\n");
-		sh->cmd_list->f_next_outfile = 1;// tmp solution need check
-		exit (1);
-	}
+	if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
+		|| sh->cmd_list->f_next_infile == 1 || sh->cmd_list->f_next_outfile == 1)
+		check_in_out_file(input, sh);
 	else if (ft_strncmp(input, "|", 2) == 0)
 	{
-		printf("| founded\n");
-		exit(1); // no implmented
+		printf("| founded\n");// tmp solution need check
+		exit (1);
 	}
 	else if (sh->cmd_list->f_next_infile)
 	{
@@ -62,7 +58,10 @@ int	cmd_cmp(char *input, t_sh *sh)
 	}
 	else
 	{
-		comand_builder(input, sh);
+		if (!find_built_int(input, sh))
+			comand_builder(input, sh);
+		sh->cmd_list->cmd_count += 1;
+		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ((void *)0);
 	}
 	return (0);
 }
@@ -87,23 +86,13 @@ void	parser(char *input, t_sh *sh)
 {
 	char **input_arr;
 
-	sh->cmd_list = galloc(sizeof(t_cmd), sh);
-	sh->cmd_list->cmd_count = 0;
-	sh->cmd_list->pipes = 0;
-	sh->cmd_list->f_next_infile = 0;
-	sh->cmd_list->f_next_outfile = 0;
-	sh->cmd_list->cmd = NULL;
-	sh->cmd_list->infile = NULL;
-	sh->cmd_list->outfile = NULL;
-	sh->cmd_list->next = NULL;
-	sh->cmd_list->start = NULL;
+	sh->cmd_list = cmd_init(sh->cmd_list, sh);
 	if (input[0] == '\0')
 		return ;
 	input_arr = ft_split(input, ' ');
-	//if (ft_strncmp(sh->cmd_list->cmd, "", 1) != 0)
-
 	sh->cmd_list->cmd_count = find_cmd(input_arr, sh);
-	printf("%s\n", sh->cmd_list->cmd[0]);
+	//printf("%s\n", sh->cmd_list->cmd[1]); // debug
+	// check is a built_int in cmd and make a function for execute that
 	if (sh->cmd_list->cmd)
 	{
 		excute(sh);
