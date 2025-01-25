@@ -18,6 +18,7 @@ typedef struct	s_sh
 	int				argc; // debugger
 	char			**argv; // debugger
 	char			**env;
+	char			*cwd;
 	struct s_cmd	*cmd_list;
 	struct s_galloc	*l_galloc;
 }	t_sh;
@@ -29,7 +30,7 @@ typedef struct	s_cmd
 	int				pipes;
 	int				f_next_infile;
 	int				f_next_outfile;
-	int				built_int;
+	int				built_in;
 	char			*infile;
 	char			*outfile;
 	char			**cmd;
@@ -48,7 +49,7 @@ typedef struct s_galloc
 
 //line_finder.c
 char	*user_finder(char *user, char *pc, t_sh *sh);
-char	*path_finder(char *path, t_sh *sh);
+char	*path_finder(t_sh *sh);
 char	*line_finder(t_sh *sh);
 //linee_utils.c
 int		ft_lentoc(const char *str, char c);
@@ -62,11 +63,15 @@ void	*galloc(size_t size, t_sh *sh);
 //parser.c
 void	parser(char *input, t_sh *sh);
 //execute.h
-void	excute(t_sh *sh);
+void	execute(t_sh *sh);
 //built_ins.c
-int		find_built_int(char *input, t_sh *sh);
+void		find_built_in(char *input, t_sh *sh);
+int		exec_built_in(char *input, t_sh *sh);
 //cmd_init.c
 t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh);
+
+// Built in
+char	*cd(char *path);
 
 #endif
 /* DUDAS

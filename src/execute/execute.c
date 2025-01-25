@@ -6,11 +6,11 @@
 
 
 }*/
-
+/*
 void	in_file(t_sh)
+*/
 
-
-void	excute(t_sh *sh)
+void	execute(t_sh *sh)
 {
 	//cmd = path_execute(sh->cmd_list->cmd, sh);
 	sh->cmd_list->pid = fork();
@@ -22,7 +22,7 @@ void	excute(t_sh *sh)
 	else if (sh->cmd_list->pid == 0)
 	{
 		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-		printf("Commando not Found\n");
+		printf("Command not found\n");
 		exit(1);
 	}
 	int status;

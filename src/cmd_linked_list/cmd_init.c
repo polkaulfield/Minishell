@@ -12,6 +12,6 @@ t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh)
 	cmd_list->outfile = NULL;
 	cmd_list->next = NULL;
 	cmd_list->start = NULL;
-	cmd_list->built_int = 0;
+	cmd_list->built_in = 0;
 	return (cmd_list);
 }

@@ -3,10 +3,12 @@
 int	comand_builder(char *input, t_sh *sh)
 {
 	//printf("%i\n", sh->cmd_list->cmd_count); //debugger
+	find_built_in(input, sh);
 	printf("%i\n", sh->cmd_list->cmd_count);
-	if (sh->cmd_list->cmd_count == 0)
+	// TODO: Get number of parameters
+	sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
+	if (sh->cmd_list->cmd_count == 0 && !sh->cmd_list->built_in)
 	{
-		sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
 		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strjoin("/bin/", input);
 		//necesita buscar la ruta, no debe usar directamente "/bin/"
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
@@ -58,8 +60,7 @@ int	cmd_cmp(char *input, t_sh *sh)
 	}
 	else
 	{
-		if (!find_built_int(input, sh))
-			comand_builder(input, sh);
+		comand_builder(input, sh);
 		sh->cmd_list->cmd_count += 1;
 		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ((void *)0);
 	}
@@ -92,9 +93,10 @@ void	parser(char *input, t_sh *sh)
 	input_arr = ft_split(input, ' ');
 	sh->cmd_list->cmd_count = find_cmd(input_arr, sh);
 	//printf("%s\n", sh->cmd_list->cmd[1]); // debug
-	// check is a built_int in cmd and make a function for execute that
-	if (sh->cmd_list->cmd)
-	{
-		excute(sh);
-	}
+	// check is a built_in in cmd and make a function for execute that
+	printf("Is built in %d\n", sh->cmd_list->built_in);
+	if (sh->cmd_list->built_in)
+		exec_built_in(input, sh);
+	else if (sh->cmd_list->cmd)
+		execute(sh);
 }
