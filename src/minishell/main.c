@@ -14,7 +14,7 @@ int	main(int argc, char **argv, char **env)
 	sh->env = env;
 	if (argc != 1)
 		exit(1);// implement execute the input(**argv) and exit
-	while(i < 4) // tmp debugger
+	while(i < 5) // tmp debugger
 	{
 		sh->cmd_list = NULL;
 		//sh->cmd_list->cmd_count = 0;

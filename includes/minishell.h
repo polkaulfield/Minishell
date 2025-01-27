@@ -29,12 +29,14 @@ typedef struct	s_cmd
 	int				cmd_count;
 	int				out_pipe;
 	int				in_pipe;
-	int				fd_pipe[2];
+	int				*fd_pipe;
 	int				f_next_infile;
 	int				fd_in;
+	int				fd_in_red;
 	char			*infile;
 	int				f_next_outfile;
 	int				fd_out;
+	int				fd_out_red;
 	char			*outfile;
 	int				built_int;
 	char			**cmd;

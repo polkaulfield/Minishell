@@ -3,7 +3,7 @@
 int	comand_builder(char *input, t_sh *sh)
 {
 	//printf("%i\n", sh->cmd_list->cmd_count); //debugger
-	printf("%i\n", sh->cmd_list->cmd_count);
+	//printf("%i\n", sh->cmd_list->cmd_count);
 	if (sh->cmd_list->cmd_count == 0)
 	{
 		sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
@@ -23,16 +23,24 @@ void	check_in_out_file(char *input, t_sh *sh)
 {
 	if (ft_strncmp(input, "<", 2) == 0)
 		sh->cmd_list->f_next_infile = 1;
+	else if (ft_strncmp(input, "<<", 3) == 0)
+		sh->cmd_list->f_next_infile = 2;
 	else if (ft_strncmp(input, ">", 2) == 0)
 		sh->cmd_list->f_next_outfile = 1;
-	else if (sh->cmd_list->f_next_infile == 1)
+	else if (ft_strncmp(input, ">>", 3) == 0)
+		sh->cmd_list->f_next_outfile = 2;
+	else if (sh->cmd_list->f_next_infile > 0)
 	{
+		if (sh->cmd_list->f_next_infile == 2)
+			sh->cmd_list->fd_in_red = 1;
 		sh->cmd_list->f_next_infile = 0;
 		sh->cmd_list->infile = ft_strdup(input);
 		add_galloc(sh->cmd_list->infile, sh);
 	}
-	else if (sh->cmd_list->f_next_outfile == 1)
+	else if (sh->cmd_list->f_next_outfile > 0)
 	{
+		if (sh->cmd_list->f_next_outfile == 2)
+			sh->cmd_list->fd_out_red = 1;
 		sh->cmd_list->f_next_outfile = 0;
 		sh->cmd_list->outfile = ft_strdup(input);
 		add_galloc(sh->cmd_list->outfile, sh);
@@ -43,35 +51,22 @@ void	check_in_out_file(char *input, t_sh *sh)
 int	cmd_cmp(char *input, t_sh *sh)
 {
 	int	fd_pipe[2];
-
 	if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
-		|| sh->cmd_list->f_next_infile == 1 || sh->cmd_list->f_next_outfile == 1)
+		|| ft_strncmp(input, ">>", 3) == 0 || ft_strncmp(input, "<<", 3) == 0 \
+		|| sh->cmd_list->f_next_infile > 0 || sh->cmd_list->f_next_outfile > 0)
 		check_in_out_file(input, sh);
 	else if (ft_strncmp(input, "|", 2) == 0)
 	{
-		/*if (pipe(fd_pipe) < 0)
-		{
-			printf("pipe error\n");
-			terminate (sh);
-		}*/
-		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
-		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
-		//printf ("%i %i\n", fd_pipe[0], fd_pipe[1]);
-		//sh->cmd_list->fd_pipe = fd_pipe;
-		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
-		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
-		//printf("--%i\n", fd_pipe[1]);
 		sh->cmd_list->out_pipe = 1;
 		cmd_addnode(sh);
-		pipe(sh->cmd_list->fd_pipe);
-		//sh->cmd_list->fd_pipe[0] = fd_pipe[0];
-		//sh->cmd_list->fd_pipe[1] = fd_pipe[1];
-	//	printf ("%i %i\n", fd_pipe[0], fd_pipe[1]);
-		/*sh->cmd_list->fd_pipe[0] = fd_pipe[0];
-		sh->cmd_list->fd_pipe[1] = fd_pipe[1];*/
+		if (pipe(fd_pipe) < 0) //TODO:hay que revisar si esto falla que hay que hacer
+			printf("error\n");
 		sh->cmd_list->in_pipe = 1;
+		sh->cmd_list->fd_pipe = galloc(2 * sizeof(int), sh);
+		sh->cmd_list->fd_pipe[0] = fd_pipe[0];
+		sh->cmd_list->fd_pipe[1] = fd_pipe[1];
 	}
-	else if (sh->cmd_list->f_next_infile)
+/*	else if (sh->cmd_list->f_next_infile)
 	{
 		printf("%i\n", sh->cmd_list->f_next_infile);
 		sh->cmd_list->f_next_infile = 0;
@@ -84,7 +79,7 @@ int	cmd_cmp(char *input, t_sh *sh)
 		sh->cmd_list->f_next_outfile = 0;
 		sh->cmd_list->outfile = ft_strdup(input);
 		add_galloc(sh->cmd_list->outfile, sh);
-	}
+		}*/
 	else
 	{
 		if (!find_built_int(input, sh))

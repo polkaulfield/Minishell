@@ -17,9 +17,12 @@ t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh)
 	cmd_list->cmd_count = 0;
 	cmd_list->in_pipe = 0;
 	cmd_list->out_pipe = 0;
+	cmd_list->fd_pipe = NULL;
 	cmd_list->f_next_infile = 0;
+	cmd_list->fd_in_red = 0;
 	cmd_list->infile = NULL;
 	cmd_list->f_next_outfile = 0;
+	cmd_list->fd_out_red = 0;
 	cmd_list->outfile = NULL;
 	cmd_list->cmd = NULL;
 	cmd_list->infile = NULL;
