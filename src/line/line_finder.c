@@ -25,7 +25,7 @@ char	*user_finder(char *user, char *pc, t_sh *sh)
 	return (line_user);
 }
 
-char	*path_finder(char *path, t_sh *sh)
+/*char	*path_finder(char *path, t_sh *sh)
 {
 	char	*line_path;
 	int		home_size;
@@ -46,6 +46,27 @@ char	*path_finder(char *path, t_sh *sh)
 		add_galloc(line_path, sh);
 	}
 	return (line_path);
+	}*/
+char	*path_finder(t_sh *sh)
+{
+	char	*line_path;
+	int		home_size;
+	char	cwd[4096];
+
+	getcwd(cwd, sizeof(cwd));
+	line_path = galloc((strlen(cwd) + 1) * sizeof(char), sh);
+	line_path = ft_substr(cwd, 0, ft_strlen(cwd));
+	add_galloc(line_path, sh);
+
+	if (ft_strncmp(getenv("HOME"), line_path, ft_strlen(getenv("HOME"))) == 0)
+	{
+		home_size = ft_strlen(getenv("HOME"));
+		line_path = ft_substr(cwd, home_size - 1, ft_strlen(cwd) - home_size + 1);
+		line_path[0] = '~';
+		add_galloc(line_path, sh);
+	}
+
+	return (line_path);
 }
 
 char	*line_finder(t_sh *sh)
@@ -55,7 +76,7 @@ char	*line_finder(t_sh *sh)
 	char	*line;
 
 	line_user = user_finder(getenv("LOGNAME"), getenv("SESSION_MANAGER"), sh);
-	line_path = path_finder("PWD", sh);
+	line_path = path_finder( sh);
 
 	line = linejoin(line_user, line_path, sh);
 	if (!line)

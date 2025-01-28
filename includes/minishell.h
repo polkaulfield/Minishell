@@ -26,6 +26,7 @@ typedef struct	s_sh
 typedef struct	s_cmd
 {
 	int				pid;
+	int				main_proces;
 	int				cmd_count;
 	int				out_pipe;
 	int				in_pipe;
@@ -38,7 +39,7 @@ typedef struct	s_cmd
 	int				fd_out;
 	int				fd_out_red;
 	char			*outfile;
-	int				built_int;
+	int				built_in;
 	char			**cmd;
 	struct s_cmd	*next;
 	struct s_cmd	*start;
@@ -55,7 +56,7 @@ typedef struct s_galloc
 
 //line_finder.c
 char	*user_finder(char *user, char *pc, t_sh *sh);
-char	*path_finder(char *path, t_sh *sh);
+char	*path_finder(t_sh *sh);
 char	*line_finder(t_sh *sh);
 //linee_utils.c
 int		ft_lentoc(const char *str, char c);
@@ -67,13 +68,20 @@ void	free_galloc(t_sh *sh);
 void	*add_galloc(void *mem, t_sh *sh);
 void	*galloc(size_t size, t_sh *sh);
 //parser.c
+void	find_cmd(char **input_arr, t_sh *sh);
 void	parser(char *input, t_sh *sh);
 //execute.h
+void	in_file(t_sh *sh);
+void	out_file(t_sh *sh);
 void	prepare_pipe(t_sh *sh);
 t_cmd	*fork_create(t_sh *sh);
-void	excute(t_sh *sh);
+void	execute(t_sh *sh);
 //built_ins.c
-int		find_built_int(char *input, t_sh *sh);
+int	exec_built_in(t_sh *sh);
+void	find_built_in(char *input, t_sh *sh);
+void	cd(t_sh *sh);
+void	echo(t_sh *sh);
+void	executer_built_in(t_sh *sh);
 //cmd_utils.c
 t_cmd	*cmd_addnode(t_sh *sh);
 t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh);

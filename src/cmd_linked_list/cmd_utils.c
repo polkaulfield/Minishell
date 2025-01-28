@@ -14,7 +14,9 @@ t_cmd	*cmd_addnode(t_sh *sh)
 t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh)
 {
 	cmd_list = galloc(sizeof(t_cmd), sh);
+	//cmd_list->pid = 42;
 	cmd_list->cmd_count = 0;
+	cmd_list->main_proces = 0;
 	cmd_list->in_pipe = 0;
 	cmd_list->out_pipe = 0;
 	cmd_list->fd_pipe = NULL;
@@ -29,6 +31,6 @@ t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh)
 	cmd_list->outfile = NULL;
 	cmd_list->next = NULL;
 	cmd_list->start = NULL;
-	cmd_list->built_int = 0;
+	cmd_list->built_in = 0;
 	return (cmd_list);
 }

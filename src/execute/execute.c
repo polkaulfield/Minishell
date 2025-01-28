@@ -40,18 +40,21 @@ t_cmd	*fork_create(t_sh *sh)
 	cmd = sh->cmd_list;
 	while (cmd)
 	{
-		cmd->pid = fork();
-		if (cmd->pid)
-			cmd = cmd->next;
-		else
-			return (cmd);
+		if (!cmd->main_proces)
+		{
+			cmd->pid = fork();
+			if (!cmd->pid)
+				return (cmd);
+		}
+		cmd = cmd->next;
 	}
 	return (sh->cmd_list);
 }
 
 void	prepare_pipe(t_sh *sh)
 {
-		t_cmd *cmd;
+	t_cmd *cmd;
+
 	if (sh->cmd_list->in_pipe)
 		dup2(sh->cmd_list->fd_pipe[0], STDIN_FILENO);
 	if (sh->cmd_list->out_pipe)
@@ -70,12 +73,15 @@ void	prepare_pipe(t_sh *sh)
 
 //cmd = path_execute(sh->cmd_list->cmd, sh);
 	//sh->cmd_list->pid = fork();
-void	excute(t_sh *sh)
+void	execute(t_sh *sh)
 {
 	t_cmd	*temp_cmd;
 
+	execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
+	printf("minishell: Command not Found\n");
+	exit (1);
 	//printf("process\n");
-	if (sh->cmd_list->pid == -1)
+	/*if (sh->cmd_list->pid == -1)
 	{
 		printf("Fork Error\n");
 		terminate(sh);
@@ -90,8 +96,8 @@ void	excute(t_sh *sh)
 		execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
 		printf("minishell: Command not Found\n");
 		exit(1);
-	}
-	sh->cmd_list = sh->cmd_list->start;
+	}*/
+	/*sh->cmd_list = sh->cmd_list->start;
 	temp_cmd = sh->cmd_list;
 	while (temp_cmd)
 	{
@@ -107,7 +113,7 @@ void	excute(t_sh *sh)
 	{
 		waitpid(temp_cmd->pid, NULL, 0);
 		temp_cmd = temp_cmd->next;
-	}
+	}*/
 }
 
 /*char	**path_execute(char *cmd, t_sh *sh)
