@@ -124,11 +124,11 @@ void	parser(char *input, t_sh *sh)
 	}
 	else if (sh->cmd_list->pid == 0 && !sh->cmd_list->main_proces)
 	{
+		prepare_pipe(sh);
 		if (sh->cmd_list->infile)
 			in_file(sh);
 		if (sh->cmd_list->outfile)
 			out_file(sh);
-		prepare_pipe(sh);
 		if (sh->cmd_list->built_in)
 			exec_built_in(sh);
 		if (sh->cmd_list->cmd)

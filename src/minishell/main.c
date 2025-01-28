@@ -1,5 +1,17 @@
 #include "../../includes/minishell.h"
 
+void    sig_handler(int signum)
+{
+    if (signum == SIGINT)
+    {
+        printf("\n");
+        rl_on_new_line();
+        rl_replace_line("", 0);
+        //rl_redisplay();
+        readline("Hello>\n");
+    }
+}
+
 int	main(int argc, char **argv, char **env)
 {
 	char		*input;
@@ -14,7 +26,10 @@ int	main(int argc, char **argv, char **env)
 	sh->env = env;
 	if (argc != 1)
 		exit(1);// implement execute the input(**argv) and exit
-	while(i < 20) // tmp debugger
+
+
+	signal(SIGINT, sig_handler);
+	while(i < 5) // tmp debugger
 	{
 		sh->cmd_list = NULL;
 		if (env == NULL)
@@ -24,8 +39,12 @@ int	main(int argc, char **argv, char **env)
 		input = readline(line);
 		if (!input)
 			terminate(sh);
+		else
+			add_history(input);
+		add_galloc(input, sh);
+
 		parser(input, sh);
-		free(input);
+		//free(input);
 		i++; // debugger
 	}
 	//usleep(1000000); // debug

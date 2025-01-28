@@ -5,24 +5,22 @@
 void	find_built_in(char *input, t_sh *sh)
 {
 	if (ft_strncmp(input, "echo", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
+		;
 	else if (ft_strncmp(input, "cd", ft_strlen(input)) == 0)
-	{
 		sh->cmd_list->main_proces = 1;
-		sh->cmd_list->built_in = 1;
-	}
 	else if (ft_strncmp(input, "pwd", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
+		;
 	else if (ft_strncmp(input, "export", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
+		;
 	else if (ft_strncmp(input, "unset", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
+		;
 	else if (ft_strncmp(input, "env", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
+		;
 	else if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
-		sh->cmd_list->built_in = 1;
-	/*else
-		sh->cmd_list->built_in = 0;*/
+		sh->cmd_list->main_proces = 1;
+	else
+		return ;
+	sh->cmd_list->built_in = 1;
 }
 
 
@@ -68,6 +66,8 @@ void	echo(t_sh *sh)
 	int	i;
 
 	i = 0;
+	if (!sh->cmd_list->cmd[1])
+		printf("\n");
 	if (ft_strncmp(sh->cmd_list->cmd[1], "-n", 3) == 0)
 		i++;
 	i++;

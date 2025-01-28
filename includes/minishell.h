@@ -13,6 +13,7 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/time.h>//debug
+#include <signal.h> // for history
 
 typedef struct	s_sh
 {

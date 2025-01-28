@@ -78,7 +78,8 @@ void	execute(t_sh *sh)
 	t_cmd	*temp_cmd;
 
 	execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-	printf("minishell: Command not Found\n");
+	//printf("minishell: Command not Found\n");
+	write(2, "minishell: Command not Found\n", 30);
 	exit (1);
 	//printf("process\n");
 	/*if (sh->cmd_list->pid == -1)
