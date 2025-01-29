@@ -27,7 +27,7 @@ typedef struct	s_sh
 typedef struct	s_cmd
 {
 	int				pid;
-	int				main_proces;
+	int				main_process;
 	int				cmd_count;
 	int				out_pipe;
 	int				in_pipe;

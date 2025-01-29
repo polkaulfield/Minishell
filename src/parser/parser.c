@@ -11,11 +11,7 @@ int	comand_builder(char *input, t_sh *sh)
 		if (sh->cmd_list->built_in)
 			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
 		else
-		{
 			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = get_path(input);
-			printf("cmd_builder: %s\n", sh->cmd_list->cmd[sh->cmd_list->cmd_count]);
-		}
-		//necesita buscar la ruta, no debe usar directamente "/bin/"
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
 	}
 	else
@@ -130,12 +126,12 @@ void	parser(char **input_arr, t_sh *sh)
 	if (sh->cmd_list->built_in || sh->cmd_list->cmd)
 		sh->cmd_list = fork_create(sh);
 	// Subprocess
-	if (sh->cmd_list->pid == -1 && !sh->cmd_list->main_proces)
+	if (sh->cmd_list->pid == -1 && !sh->cmd_list->main_process)
 	{
 		printf("Fork Error\n");
 		exit(1); // TODO revisar si debe ser terminate o exit para el subproceso
 	}
-	else if (sh->cmd_list->pid == 0 && !sh->cmd_list->main_proces)
+	else if (sh->cmd_list->pid == 0 && !sh->cmd_list->main_process)
 	{
 		prepare_pipe(sh);
 		if (sh->cmd_list->infile)
@@ -152,7 +148,7 @@ void	parser(char **input_arr, t_sh *sh)
 	temp_cmd = sh->cmd_list;
 	while (temp_cmd)
 	{
-		if (temp_cmd->main_proces) // no estoy seguro de si esto se tiene que hacer asi
+		if (temp_cmd->main_process) // no estoy seguro de si esto se tiene que hacer asi
 		{
 			if (sh->cmd_list->infile)
 				in_file(sh);

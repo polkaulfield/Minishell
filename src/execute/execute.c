@@ -40,7 +40,7 @@ t_cmd	*fork_create(t_sh *sh)
 	cmd = sh->cmd_list;
 	while (cmd)
 	{
-		if (!cmd->main_proces)
+		if (!cmd->main_process)
 		{
 			cmd->pid = fork();
 			if (!cmd->pid)
@@ -78,11 +78,6 @@ void	execute(t_sh *sh)
 	t_cmd	*temp_cmd;
 
 	execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-<<<<<<< Updated upstream
-	//printf("minishell: Command not Found\n");
-	write(2, "minishell: Command not Found\n", 30);
-=======
 	printf("minishell: Command not Found %s\n", sh->cmd_list->cmd[0]);
->>>>>>> Stashed changes
 	exit (1);
 }

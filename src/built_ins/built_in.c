@@ -7,7 +7,7 @@ void	find_built_in(char *input, t_sh *sh)
 	if (ft_strncmp(input, "echo", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "cd", ft_strlen(input)) == 0)
-		sh->cmd_list->main_proces = 1;
+		sh->cmd_list->main_process = 1;
 	else if (ft_strncmp(input, "pwd", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "export", ft_strlen(input)) == 0)
@@ -17,19 +17,12 @@ void	find_built_in(char *input, t_sh *sh)
 	else if (ft_strncmp(input, "env", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
-<<<<<<< Updated upstream
-		sh->cmd_list->main_proces = 1;
-	else
-		return ;
-	sh->cmd_list->built_in = 1;
-=======
 	{
-		sh->cmd_list->main_proces = 1;
+		sh->cmd_list->main_process = 1;
 		sh->cmd_list->built_in = 1;
 	}
 	/*else
 		sh->cmd_list->built_in = 0;*/
->>>>>>> Stashed changes
 }
 
 int	exec_built_in(t_sh *sh)
