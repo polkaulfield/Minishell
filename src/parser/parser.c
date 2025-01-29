@@ -1,85 +1,108 @@
 #include "../../includes/minishell.h"
 
-int	comand_builder(char *input, t_sh *sh)
+int	command_builder(char *input, t_sh *sh)
 {
 	char	*path;
+	t_cmd	*cmd;
 
+	cmd = sh->cmd_list;
 	find_built_in(input, sh);
 	if (sh->cmd_list->cmd_count == 0)
 	{
-		sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
-		if (sh->cmd_list->built_in)
-			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
+		cmd->cmd_arr = galloc(10 * sizeof(char *), sh);
+		if (cmd->built_in)
+			cmd->cmd_arr[cmd->cmd_count] = ft_strdup(input);
 		else
-		{
-			printf("not built in\n");
-			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = get_path(input);
-		}
-		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
+			cmd->cmd_arr[cmd->cmd_count] = get_path(input);
+		add_galloc(cmd->cmd_arr[cmd->cmd_count], sh);
 	}
 	else
 	{
-		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
-		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
+		cmd->cmd_arr[cmd->cmd_count] = ft_strdup(input);
+		add_galloc(cmd->cmd_arr[cmd->cmd_count], sh);
 	}
+	cmd->cmd_count += 1;
+	cmd->cmd_arr[cmd->cmd_count] = NULL;
 	return (0);
 }
 
 void	check_in_out_file(char *input, t_sh *sh)
 {
+	t_cmd	*cmd;
+
+	cmd = sh->cmd_list;
 	if (ft_strncmp(input, "<", 2) == 0)
-		sh->cmd_list->f_next_infile = 1;
+		cmd->f_next_infile = 1;
 	else if (ft_strncmp(input, "<<", 3) == 0)
-		sh->cmd_list->f_next_infile = 2;
+		cmd->f_next_infile = 2;
 	else if (ft_strncmp(input, ">", 2) == 0)
-		sh->cmd_list->f_next_outfile = 1;
+		cmd->f_next_outfile = 1;
 	else if (ft_strncmp(input, ">>", 3) == 0)
-		sh->cmd_list->f_next_outfile = 2;
-	else if (sh->cmd_list->f_next_infile > 0)
+		cmd->f_next_outfile = 2;
+	else if (cmd->f_next_infile > 0)
 	{
-		if (sh->cmd_list->f_next_infile == 2)
-			sh->cmd_list->fd_in_red = 1;
-		sh->cmd_list->f_next_infile = 0;
-		sh->cmd_list->infile = ft_strdup(input);
-		add_galloc(sh->cmd_list->infile, sh);
+		if (cmd->f_next_infile == 2)
+			cmd->fd_in_red = 1;
+		cmd->f_next_infile = 0;
+		cmd->infile = ft_strdup(input);
+		add_galloc(cmd->infile, sh);
 	}
-	else if (sh->cmd_list->f_next_outfile > 0)
+	else if (cmd->f_next_outfile > 0)
 	{
-		if (sh->cmd_list->f_next_outfile == 2)
-			sh->cmd_list->fd_out_red = 1;
-		sh->cmd_list->f_next_outfile = 0;
-		sh->cmd_list->outfile = ft_strdup(input);
-		add_galloc(sh->cmd_list->outfile, sh);
+		if (cmd->f_next_outfile == 2)
+			cmd->fd_out_red = 1;
+		cmd->f_next_outfile = 0;
+		cmd->outfile = ft_strdup(input);
+		add_galloc(cmd->outfile, sh);
 	}
 }
 
-//comand compare
+int	check_std_redir(char *input, t_sh *sh)
+{
+	t_cmd	*cmd;
+
+	cmd = sh->cmd_list;
+	if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
+		|| ft_strncmp(input, ">>", 3) == 0 || ft_strncmp(input, "<<", 3) == 0 \
+		|| cmd->f_next_infile > 0 || cmd->f_next_outfile > 0)
+		return (1);
+	return (0);
+}
+
+int	manage_cmd_pipes(char *input, t_sh *sh)
+{
+	t_cmd	*cmd;
+
+	int		fd_pipe[2];
+	cmd = sh->cmd_list;
+	cmd->out_pipe = 1;
+	cmd_addnode(sh);
+	cmd = sh->cmd_list;
+	if (pipe(fd_pipe) < 0) //TODO:hay que revisar si esto falla que hay que hacer
+		printf("error\n");
+	cmd->in_pipe = 1;
+	cmd->fd_pipe = galloc(2 * sizeof(int), sh);
+	cmd->fd_pipe[0] = fd_pipe[0];
+	cmd->fd_pipe[1] = fd_pipe[1];
+	return (1);
+}
+
+//command compare
 int	cmd_cmp(char *input, t_sh *sh)
 {
-	int	fd_pipe[2];
+	t_cmd	*cmd;
 
+	cmd = sh->cmd_list;
 	if (ft_strchr(input, '='))
 		add_var(input, sh);
-	else if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
-		|| ft_strncmp(input, ">>", 3) == 0 || ft_strncmp(input, "<<", 3) == 0 \
-		|| sh->cmd_list->f_next_infile > 0 || sh->cmd_list->f_next_outfile > 0)
+	else if (check_std_redir(input, sh))
 		check_in_out_file(input, sh);
 	else if (ft_strncmp(input, "|", 2) == 0)
-	{
-		sh->cmd_list->out_pipe = 1;
-		cmd_addnode(sh);
-		if (pipe(fd_pipe) < 0) //TODO:hay que revisar si esto falla que hay que hacer
-			printf("error\n");
-		sh->cmd_list->in_pipe = 1;
-		sh->cmd_list->fd_pipe = galloc(2 * sizeof(int), sh);
-		sh->cmd_list->fd_pipe[0] = fd_pipe[0];
-		sh->cmd_list->fd_pipe[1] = fd_pipe[1];
-	}
+		manage_cmd_pipes(input, sh);
 	else
 	{
-		comand_builder(input, sh);
-		sh->cmd_list->cmd_count += 1;
-		sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ((void *)0);
+		command_builder(input, sh);
+
 	}
 	return (0);
 }
@@ -109,6 +132,22 @@ void	find_cmd(char **input_arr, t_sh *sh)
 		i = -1;
 }
 
+void	pipe_cleaner(t_sh *sh)
+{
+	t_cmd	*cmd_node;
+
+	cmd_node = sh->cmd_list->start;
+	while (cmd_node)
+	{
+		if (cmd_node->fd_pipe)
+		{
+			close(cmd_node->fd_pipe[0]);
+			close(cmd_node->fd_pipe[1]);
+		}
+		cmd_node = cmd_node->next;
+	}
+}
+
 void	parser(char **input_arr, t_sh *sh)
 {
 	//char **input_arr;
@@ -120,13 +159,13 @@ void	parser(char **input_arr, t_sh *sh)
 	find_cmd(input_arr, sh);
 	//sh->cmd_list = sh->cmd_list->start; // movido a fork create
 
-	//printf("%s\n", sh->cmd_list->cmd[1]); // debug
+	//printf("%s\n", sh->cmd_list->cmd_arr[1]); // debug
 	// check is a built_int in cmd and make a function for execute that
 	//sh->cmd_list = fork_create(sh);
 	// TODO revisar essto, hay que usar subprocesos con builtins
 
 	//TODO separa a dos funciones distintas lo siguiente
-	if (sh->cmd_list->built_in || sh->cmd_list->cmd)
+	if (sh->cmd_list->built_in || sh->cmd_list->cmd_arr)
 		sh->cmd_list = fork_create(sh);
 	// Subprocess
 	if (sh->cmd_list->pid == -1 && !sh->cmd_list->main_process)
@@ -143,7 +182,7 @@ void	parser(char **input_arr, t_sh *sh)
 			out_file(sh);
 		if (sh->cmd_list->built_in)
 			exec_built_in(sh);
-		if (sh->cmd_list->cmd)
+		if (sh->cmd_list->cmd_arr)
 			execute(sh);
 	}
 	// Main process
@@ -164,19 +203,11 @@ void	parser(char **input_arr, t_sh *sh)
 	}
 	sh->cmd_list = sh->cmd_list->start;
 	temp_cmd = sh->cmd_list;
-	while (temp_cmd)
-	{
-		if (temp_cmd->fd_pipe)
-		{
-			close(temp_cmd->fd_pipe[0]);
-			close(temp_cmd->fd_pipe[1]);
-		}
-		temp_cmd = temp_cmd->next;
-	}
+	pipe_cleaner(sh);
 	temp_cmd = sh->cmd_list->start;
 	while (temp_cmd)
 	{
-		waitpid(temp_cmd->pid, &sh->last_comand, 0);
+		waitpid(temp_cmd->pid, &sh->last_command, 0);
 		//printf("%i\n", sh->last_comand);
 		temp_cmd = temp_cmd->next;
 	}
