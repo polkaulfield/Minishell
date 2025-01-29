@@ -7,8 +7,8 @@ void    sig_handler(int signum)
         printf("\n");
         rl_on_new_line();
         rl_replace_line("", 0);
-        //rl_redisplay();
-        readline("Hello>\n");
+        rl_redisplay();
+        //readline("Hello>\n");
     }
 }
 
@@ -21,12 +21,15 @@ int	main(int argc, char **argv, char **env)
 	int	i = 0; // debugger
 	sh = malloc(sizeof(t_sh));
 	sh->l_galloc = NULL;
-	sh->argc = argc;
-	sh->argv = argv;
 	sh->env = env;
+	sh->last_comand = 0;
+	sh->var_list = var_init(sh->var_list, sh);
 	if (argc != 1)
+	{
+		parser(&argv[1], sh);
+		terminate (sh);
 		exit(1);// implement execute the input(**argv) and exit
-
+	}
 
 	signal(SIGINT, sig_handler);
 	while(i < 5) // tmp debugger
@@ -42,8 +45,8 @@ int	main(int argc, char **argv, char **env)
 		else
 			add_history(input);
 		add_galloc(input, sh);
-
-		parser(input, sh);
+		if (input[0] != '\0')
+			parser(ft_split(input, ' '), sh);
 		//free(input);
 		i++; // debugger
 	}

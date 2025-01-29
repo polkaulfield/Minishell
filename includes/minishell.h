@@ -17,9 +17,9 @@
 
 typedef struct	s_sh
 {
-	int				argc; // debugger
-	char			**argv; // debugger
+	int				last_comand;
 	char			**env;
+	struct s_var	*var_list;
 	struct s_cmd	*cmd_list;
 	struct s_galloc	*l_galloc;
 }	t_sh;
@@ -46,6 +46,13 @@ typedef struct	s_cmd
 	struct s_cmd	*start;
 }	t_cmd;
 
+typedef struct	s_var
+{
+	char			*var;
+	char			**value;
+	struct s_var	*next;
+}	t_var;
+
 typedef struct s_galloc
 {
 	void			*mem;
@@ -70,7 +77,7 @@ void	*add_galloc(void *mem, t_sh *sh);
 void	*galloc(size_t size, t_sh *sh);
 //parser.c
 void	find_cmd(char **input_arr, t_sh *sh);
-void	parser(char *input, t_sh *sh);
+void	parser(char **input_arr, t_sh *sh);
 //execute.h
 void	in_file(t_sh *sh);
 void	out_file(t_sh *sh);
@@ -78,7 +85,7 @@ void	prepare_pipe(t_sh *sh);
 t_cmd	*fork_create(t_sh *sh);
 void	execute(t_sh *sh);
 //built_ins.c
-int	exec_built_in(t_sh *sh);
+int		exec_built_in(t_sh *sh);
 void	find_built_in(char *input, t_sh *sh);
 void	cd(t_sh *sh);
 void	echo(t_sh *sh);
@@ -86,6 +93,11 @@ void	executer_built_in(t_sh *sh);
 //cmd_utils.c
 t_cmd	*cmd_addnode(t_sh *sh);
 t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh);
+//var_utils.c
+void	add_var(char *input, t_sh *sh);
+char	**found_var(char *input, t_sh *sh);
+t_var	*var_init(t_var *var, t_sh *sh);
+t_var	*var_addnode(t_sh *sh);
 
 #endif
 /* DUDAS

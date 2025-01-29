@@ -1,7 +1,7 @@
 NAME = minishell
 CC = cc
 RM = rm -f
-FLAGS = -g
+FLAGS =
 LIBFTDIR = libft/
 OBJ_DIR = obj/
 

@@ -18,7 +18,8 @@ void	free_galloc(t_sh *sh)
 		list_galloc = list_galloc->next;
 		if (temp_galloc->mem)
 			free(temp_galloc->mem);
-		free(temp_galloc);
+		if (temp_galloc)
+			free(temp_galloc);
 	}
 }
 

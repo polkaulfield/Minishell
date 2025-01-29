@@ -45,7 +45,9 @@ int	exec_built_in(t_sh *sh)
 		printf("env\n");
 	else if (ft_strncmp(sh->cmd_list->cmd[0], "exit", ft_strlen(sh->cmd_list->cmd[0])) == 0)
 		// TODO: Implement good exit
+	{
 		exit(EXIT_SUCCESS);
+	}
 	else
 		return (1);
 	return (0);

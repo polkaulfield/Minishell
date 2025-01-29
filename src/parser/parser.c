@@ -57,7 +57,10 @@ void	check_in_out_file(char *input, t_sh *sh)
 int	cmd_cmp(char *input, t_sh *sh)
 {
 	int	fd_pipe[2];
-	if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
+
+	if (ft_strchr(input, '='))
+		add_var(input, sh);
+	else if (ft_strncmp(input, ">", 2) == 0 || ft_strncmp(input, "<", 2) == 0 \
 		|| ft_strncmp(input, ">>", 3) == 0 || ft_strncmp(input, "<<", 3) == 0 \
 		|| sh->cmd_list->f_next_infile > 0 || sh->cmd_list->f_next_outfile > 0)
 		check_in_out_file(input, sh);
@@ -84,28 +87,36 @@ int	cmd_cmp(char *input, t_sh *sh)
 void	find_cmd(char **input_arr, t_sh *sh)
 {
 	static int	i = -1;
+	char	**value_var;
 
 	//i = -1;
 	add_galloc(input_arr, sh);
+	// si se ejecuta "./minishell cat Hola" hace free a los args del main y da error
 	while (input_arr[++i])
 	{
 		add_galloc(input_arr[i], sh);
-		cmd_cmp(input_arr[i], sh);
+		// si se ejecuta "./minishell cat Hola" hace free a los args del main y da error
+		if (ft_strchr(input_arr[i], '$'))
+		{
+			value_var = found_var(input_arr[i], sh);
+			while (*value_var)
+				cmd_cmp(*(value_var++), sh);
+		}
+		else
+			cmd_cmp(input_arr[i], sh);
 	}
 	if (!input_arr[i])
 		i = -1;
 }
 
-void	parser(char *input, t_sh *sh)
+void	parser(char **input_arr, t_sh *sh)
 {
-	char **input_arr;
+	//char **input_arr;
 	t_cmd	*temp_cmd;
-
+	 // var init
 	sh->cmd_list = cmd_init(sh->cmd_list, sh);
 	sh->cmd_list->start = sh->cmd_list;
-	if (input[0] == '\0')
-		return ;
-	input_arr = ft_split(input, ' ');
+
 	find_cmd(input_arr, sh);
 	//sh->cmd_list = sh->cmd_list->start; // movido a fork create
 
@@ -115,7 +126,8 @@ void	parser(char *input, t_sh *sh)
 	// TODO revisar essto, hay que usar subprocesos con builtins
 
 	//TODO separa a dos funciones distintas lo siguiente
-	sh->cmd_list = fork_create(sh);
+	if (sh->cmd_list->built_in || sh->cmd_list->cmd)
+		sh->cmd_list = fork_create(sh);
 	// Subprocess
 	if (sh->cmd_list->pid == -1 && !sh->cmd_list->main_proces)
 	{
@@ -164,7 +176,8 @@ void	parser(char *input, t_sh *sh)
 	temp_cmd = sh->cmd_list->start;
 	while (temp_cmd)
 	{
-		waitpid(temp_cmd->pid, NULL, 0);
+		waitpid(temp_cmd->pid, &sh->last_comand, 0);
+		printf("%i\n", sh->last_comand);
 		temp_cmd = temp_cmd->next;
 	}
 }
