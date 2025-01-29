@@ -2,18 +2,19 @@
 
 int	comand_builder(char *input, t_sh *sh)
 {
-	//printf("%i\n", sh->cmd_list->cmd_count); //debugger
-	find_built_in(input, sh);
+	char	*path;
 
+	find_built_in(input, sh);
 	if (sh->cmd_list->cmd_count == 0)
 	{
 		sh->cmd_list->cmd = galloc(10 * sizeof(char *), sh);
 		if (sh->cmd_list->built_in)
-		{
 			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
-		}
 		else
-			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strjoin("/bin/", input);
+		{
+			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = get_path(input);
+			printf("cmd_builder: %s\n", sh->cmd_list->cmd[sh->cmd_list->cmd_count]);
+		}
 		//necesita buscar la ruta, no debe usar directamente "/bin/"
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
 	}
