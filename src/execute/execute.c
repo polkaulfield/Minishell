@@ -1,7 +1,5 @@
 #include "../../includes/minishell.h"
 
-
-
 void	in_file(t_sh *sh)
 {
 	if (sh->cmd_list->fd_in_red)
@@ -19,65 +17,59 @@ void	in_file(t_sh *sh)
 
 void	out_file(t_sh *sh)
 {
-	if (sh->cmd_list->fd_out_red)
-		sh->cmd_list->fd_out = open(sh->cmd_list->outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
+	t_cmd	*cmd;
+
+	cmd = sh->cmd_list;
+	if (cmd->fd_out_red)
+		cmd->fd_out = open(cmd->outfile, O_WRONLY | O_CREAT | O_APPEND, 0644);
 	else
-		sh->cmd_list->fd_out = open(sh->cmd_list->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-	if (sh->cmd_list->fd_out < 0)
+		cmd->fd_out = open(cmd->outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+	if (cmd->fd_out < 0)
 	{
 		printf("outfile error\n");
 		exit(1);
 	}
-	dup2(sh->cmd_list->fd_out, STDOUT_FILENO);
-	close(sh->cmd_list->fd_out);
+	dup2(cmd->fd_out, STDOUT_FILENO);
+	close(cmd->fd_out);
 }
 
 t_cmd	*fork_create(t_sh *sh)
 {
-	t_cmd	*cmd;
+	t_cmd	*cmd_node;
 
-	sh->cmd_list = sh->cmd_list->start;
-	cmd = sh->cmd_list;
-	while (cmd)
+	sh->cmd_list = sh->cmd_list->start; // I hope this doesnt break
+	cmd_node = sh->cmd_list->start;
+	while (cmd_node)
 	{
-		if (!cmd->main_process)
+		if (!cmd_node->main_process)
 		{
-			cmd->pid = fork();
-			if (!cmd->pid)
-				return (cmd);
+			cmd_node->pid = fork();
+			if (!cmd_node->pid)
+				return (cmd_node);
 		}
-		cmd = cmd->next;
+		cmd_node = cmd_node->next;
 	}
 	return (sh->cmd_list);
 }
 
 void	prepare_pipe(t_sh *sh)
 {
-	t_cmd *cmd;
+	t_cmd	*cmd;
 
-	if (sh->cmd_list->in_pipe)
-		dup2(sh->cmd_list->fd_pipe[0], STDIN_FILENO);
-	if (sh->cmd_list->out_pipe)
-		dup2(sh->cmd_list->next->fd_pipe[1], STDOUT_FILENO);
-	cmd = sh->cmd_list->start;
-	while (cmd)
-	{
-		if (cmd->fd_pipe)
-		{
-			close(cmd->fd_pipe[0]);
-			close(cmd->fd_pipe[1]);
-		}
-		cmd = cmd->next;
-	}
+	cmd = sh->cmd_list;
+	if (cmd->in_pipe)
+		dup2(cmd->fd_pipe[0], STDIN_FILENO);
+	if (cmd->out_pipe)
+		dup2(cmd->next->fd_pipe[1], STDOUT_FILENO);
+	pipe_cleaner(sh);
 }
 
-//cmd = path_execute(sh->cmd_list->cmd, sh);
-	//sh->cmd_list->pid = fork();
 void	execute(t_sh *sh)
 {
-	t_cmd	*temp_cmd;
+	t_cmd	*cmd;
 
-	execve(sh->cmd_list->cmd[0], sh->cmd_list->cmd, sh->env);
-	printf("minishell: Command not Found %s\n", sh->cmd_list->cmd[0]);
+	cmd = sh->cmd_list;
+	execve(cmd->cmd_arr[0], cmd->cmd_arr, sh->env);
+	printf("minishell: Command not Found %s\n", cmd->cmd_arr[0]);
 	exit (1);
 }

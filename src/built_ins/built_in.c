@@ -2,22 +2,34 @@
 
 //void	echo_built_int()
 
+int	is_built_in(char *input, char *cmd)
+{
+	if (ft_strncmp(input, cmd, ft_strlen(input)) == 0)
+		return (1);
+	return (0);
+}
+
+void	set_main_process(t_sh *sh)
+{
+	sh->cmd_list->main_process = 1;
+}
+
 void	find_built_in(char *input, t_sh *sh)
 {
-	if (ft_strncmp(input, "echo", ft_strlen(input)) == 0)
+	if (is_built_in(input, "echo"))
 		;
-	else if (ft_strncmp(input, "cd", ft_strlen(input)) == 0)
-		sh->cmd_list->main_process = 1;
-	else if (ft_strncmp(input, "pwd", ft_strlen(input)) == 0)
+	else if (is_built_in(input, "cd"))
+		set_main_process(sh);
+	else if (is_built_in(input, "pwd"))
 		;
-	else if (ft_strncmp(input, "export", ft_strlen(input)) == 0)
+	else if (is_built_in(input, "export"))
 		;
-	else if (ft_strncmp(input, "unset", ft_strlen(input)) == 0)
+	else if (is_built_in(input, "unset"))
 		;
-	else if (ft_strncmp(input, "env", ft_strlen(input)) == 0)
+	else if (is_built_in(input, "env"))
 		;
-	else if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
-		sh->cmd_list->main_process = 1;
+	else if (is_built_in(input, "exit"))
+		set_main_process(sh);
 	else
 		return ;
 	sh->cmd_list->built_in = 1;
@@ -25,51 +37,42 @@ void	find_built_in(char *input, t_sh *sh)
 
 int	exec_built_in(t_sh *sh)
 {
-	if (ft_strncmp(sh->cmd_list->cmd[0], "echo", ft_strlen(sh->cmd_list->cmd[0])) == 0)
+	char	*cmd;
+
+	cmd = sh->cmd_list->cmd_arr[0];
+	if (is_built_in(cmd, "echo"))
 		echo(sh);
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "cd", ft_strlen(sh->cmd_list->cmd[0])) == 0)
-	{
-		printf("We are in CD count = %d\n", sh->cmd_list->cmd_count);
-		if (sh->cmd_list->cmd_count > 0)
-			cd(sh);
-	}
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "pwd", ft_strlen(sh->cmd_list->cmd[0])) == 0)
+	else if (is_built_in(cmd, "cd"))
+		cd(sh);
+	else if (is_built_in(cmd, "pwd"))
 		printf("pwd\n");
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "export", ft_strlen(sh->cmd_list->cmd[0])) == 0)
+	else if (is_built_in(cmd, "export"))
 		printf("export\n");
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "unset", ft_strlen(sh->cmd_list->cmd[0])) == 0)
+	else if (is_built_in(cmd, "unset"))
 		printf("unset\n");
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "env", ft_strlen(sh->cmd_list->cmd[0])) == 0)
+	else if (is_built_in(cmd, "env"))
 		printf("env\n");
-	else if (ft_strncmp(sh->cmd_list->cmd[0], "exit", ft_strlen(sh->cmd_list->cmd[0])) == 0)
-		// TODO: Implement good exit
-	{
+	else if (is_built_in(cmd, "exit"))
 		exit(EXIT_SUCCESS);
-	}
 	else
 		return (1);
 	return (0);
 }
-/*
-void	cd(t_sh *sh)
-{
-	//char	cwd[4096];
-
-	chdir(sh->cmd_list->cmd[1]);
-	//getcwd(cwd, sizeof(cwd));
-	//printf("Current dir : %s", cwd);
-	//return (ft_strdup(cwd));
-}
-*/
 
 void	cd(t_sh *sh)
 {
 	char	*home_path;
 	char	*path;
+	t_cmd	*cmd;
 
-	path = sh->cmd_list->cmd[1];
+	cmd = sh->cmd_list;
 	home_path = getenv("HOME");
-	printf("home_path %s", home_path);
+	if (cmd->cmd_count == 1)
+	{
+		chdir(home_path);
+		return ;
+	}
+	path = cmd->cmd_arr[1];
 	if (path[0] == '~')
 	{
 		if (ft_strlen(path) > 1)
@@ -85,69 +88,27 @@ void	cd(t_sh *sh)
 void	echo(t_sh *sh)
 {
 	int	i;
+	t_cmd	*cmd;
 
+	cmd = sh->cmd_list;
 	i = 0;
-	if (!sh->cmd_list->cmd[1])
+	if (cmd->cmd_count != 1)
 		printf("\n");
-	if (ft_strncmp(sh->cmd_list->cmd[1], "-n", 3) == 0)
+	if (ft_strncmp(cmd->cmd_arr[1], "-n", 3) == 0)
 		i++;
 	i++;
-	while (sh->cmd_list->cmd[i])
+	while (cmd->cmd_arr[i])
 	{
-		printf("%s", sh->cmd_list->cmd[i++]);
-		if (sh->cmd_list->cmd[i])
+		printf("%s", cmd->cmd_arr[i++]);
+		if (cmd->cmd_arr[i])
 			printf(" ");
 	}
-	if (ft_strncmp(sh->cmd_list->cmd[1], "-n", 3) != 0)
+	if (ft_strncmp(cmd->cmd_arr[1], "-n", 3) != 0)
 		printf("\n");
 	exit (0);
 }
-/*void	executer_built_in(t_sh *sh)
+
+void	export(t_sh *sh)
 {
-	t_cmd	*temp_cmd;
 
-	//printf("process\n");
-	if (sh->cmd_list->pid == -1)
-	{
-		printf("Fork Error\n");
-		terminate(sh);
-	}
-	else if (sh->cmd_list->pid == 0)
-	{
-		if (sh->cmd_list->infile)
-			in_file(sh);
-		if (sh->cmd_list->outfile)
-			out_file(sh);
-		prepare_pipe(sh);
-		exec_built_in(sh);
-		printf("minishell: Command not Found\n");
-		exit(1);
-	}
-	sh->cmd_list = sh->cmd_list->start;
-	temp_cmd = sh->cmd_list;
-	while (temp_cmd)
-	{
-		if (temp_cmd->fd_pipe)
-		{
-			close(temp_cmd->fd_pipe[0]);
-			close(temp_cmd->fd_pipe[1]);
-		}
-		temp_cmd = temp_cmd->next;
-	}
-	temp_cmd = sh->cmd_list->start;
-	while (temp_cmd)
-	{
-		waitpid(temp_cmd->pid, NULL, 0);
-		temp_cmd = temp_cmd->next;
-
-}*/
-
-/*
-echo con la opción -n.
-cd solo con una ruta relativa o absoluta.
-pwd sin opciones.
-export sin opciones.
-unset sin opciones.
-env sin opciones o argumentos.
-exit sin opciones.
-*/
+}

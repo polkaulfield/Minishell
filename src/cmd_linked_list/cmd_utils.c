@@ -26,7 +26,7 @@ t_cmd	*cmd_init(t_cmd *cmd_list, t_sh *sh)
 	cmd_list->f_next_outfile = 0;
 	cmd_list->fd_out_red = 0;
 	cmd_list->outfile = NULL;
-	cmd_list->cmd = NULL;
+	cmd_list->cmd_arr = NULL;
 	cmd_list->infile = NULL;
 	cmd_list->outfile = NULL;
 	cmd_list->next = NULL;

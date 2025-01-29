@@ -17,9 +17,7 @@ void	add_var(char *input, t_sh *sh)
 	var_node->var = galloc(((ft_strlen(input)
 		- ft_strlen(ft_strchr(input, '='))) + 1) * sizeof(char), sh);
 	while (*input && *input != '=')
-	{
 		var_node->var[i++] = *(input++);
-	}
 	input++;
 	var_node->value = ft_split(input, ' ');
 }
@@ -32,9 +30,8 @@ char **found_var(char *input, t_sh *sh)
 	value = NULL;
 	var_iter = sh->var_list;
 	input++;
-	printf("%i\n", sh->last_comand);
 	if (ft_strncmp(input, "?", 2) == 0)
-		return(ft_split(ft_itoa(sh->last_comand), ' ')); // no lo puedo anyadir al galloc
+		return(ft_split(ft_itoa(sh->last_command), ' ')); // no lo puedo anyadir al galloc
 	while (var_iter)
 	{
 		if (var_iter->var)

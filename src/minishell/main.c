@@ -22,7 +22,7 @@ int	main(int argc, char **argv, char **env)
 	sh = malloc(sizeof(t_sh));
 	sh->l_galloc = NULL;
 	sh->env = env;
-	sh->last_comand = 0;
+	sh->last_command = 0;
 	sh->var_list = var_init(sh->var_list, sh);
 	if (argc != 1)
 	{
