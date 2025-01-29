@@ -27,7 +27,7 @@ typedef struct	s_sh
 typedef struct	s_cmd
 {
 	int				pid;
-	int				main_proces;
+	int				main_process;
 	int				cmd_count;
 	int				out_pipe;
 	int				in_pipe;
@@ -66,6 +66,7 @@ typedef struct s_galloc
 char	*user_finder(char *user, char *pc, t_sh *sh);
 char	*path_finder(t_sh *sh);
 char	*line_finder(t_sh *sh);
+char	*get_path(char *command);
 //linee_utils.c
 int		ft_lentoc(const char *str, char c);
 char	*linejoin(char *user, char *path, t_sh *sh);
@@ -98,6 +99,9 @@ void	add_var(char *input, t_sh *sh);
 char	**found_var(char *input, t_sh *sh);
 t_var	*var_init(t_var *var, t_sh *sh);
 t_var	*var_addnode(t_sh *sh);
+
+// Misc utils
+void	free_str_arr(char **str_arr);
 
 #endif
 /* DUDAS

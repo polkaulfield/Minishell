@@ -7,7 +7,7 @@ void	find_built_in(char *input, t_sh *sh)
 	if (ft_strncmp(input, "echo", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "cd", ft_strlen(input)) == 0)
-		sh->cmd_list->main_proces = 1;
+		sh->cmd_list->main_process = 1;
 	else if (ft_strncmp(input, "pwd", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "export", ft_strlen(input)) == 0)
@@ -17,13 +17,11 @@ void	find_built_in(char *input, t_sh *sh)
 	else if (ft_strncmp(input, "env", ft_strlen(input)) == 0)
 		;
 	else if (ft_strncmp(input, "exit", ft_strlen(input)) == 0)
-		sh->cmd_list->main_proces = 1;
+		sh->cmd_list->main_process = 1;
 	else
 		return ;
 	sh->cmd_list->built_in = 1;
 }
-
-
 
 int	exec_built_in(t_sh *sh)
 {
@@ -31,7 +29,7 @@ int	exec_built_in(t_sh *sh)
 		echo(sh);
 	else if (ft_strncmp(sh->cmd_list->cmd[0], "cd", ft_strlen(sh->cmd_list->cmd[0])) == 0)
 	{
-		//printf("We are in CD count = %d\n", sh->cmd_list->cmd_count);
+		printf("We are in CD count = %d\n", sh->cmd_list->cmd_count);
 		if (sh->cmd_list->cmd_count > 0)
 			cd(sh);
 	}
@@ -52,15 +50,36 @@ int	exec_built_in(t_sh *sh)
 		return (1);
 	return (0);
 }
-
+/*
 void	cd(t_sh *sh)
 {
-	char	cwd[4096];
+	//char	cwd[4096];
 
 	chdir(sh->cmd_list->cmd[1]);
 	//getcwd(cwd, sizeof(cwd));
 	//printf("Current dir : %s", cwd);
 	//return (ft_strdup(cwd));
+}
+*/
+
+void	cd(t_sh *sh)
+{
+	char	*home_path;
+	char	*path;
+
+	path = sh->cmd_list->cmd[1];
+	home_path = getenv("HOME");
+	printf("home_path %s", home_path);
+	if (path[0] == '~')
+	{
+		if (ft_strlen(path) > 1)
+			home_path = ft_strjoin(home_path, path + 1);
+		else
+			home_path = ft_strdup(home_path);
+		chdir(home_path);
+		free(home_path);
+	}
+	chdir(path);
 }
 
 void	echo(t_sh *sh)
