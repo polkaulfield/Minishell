@@ -92,7 +92,7 @@ void	echo(t_sh *sh)
 
 	cmd = sh->cmd_list;
 	i = 0;
-	if (cmd->cmd_count != 1)
+	if (cmd->cmd_count == 1)
 		printf("\n");
 	if (ft_strncmp(cmd->cmd_arr[1], "-n", 3) == 0)
 		i++;
