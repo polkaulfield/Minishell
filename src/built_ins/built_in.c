@@ -87,7 +87,7 @@ void	cd(t_sh *sh)
 
 void	echo(t_sh *sh)
 {
-	int	i;
+	int		i;
 	t_cmd	*cmd;
 
 	cmd = sh->cmd_list;

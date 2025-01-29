@@ -13,11 +13,14 @@
 # include <unistd.h>
 # include <fcntl.h>
 # include <sys/time.h>//debug
-#include <signal.h> // for history
+# include <signal.h> // for history
+# define SINGLE_REDIR 1
+# define DOUBLE_REDIR 2
+# define NO_REDIR 0
 
 typedef struct	s_sh
 {
-	int				last_comand;
+	int				last_command;
 	char			**env;
 	struct s_var	*var_list;
 	struct s_cmd	*cmd_list;
@@ -41,7 +44,7 @@ typedef struct	s_cmd
 	int				fd_out_red;
 	char			*outfile;
 	int				built_in;
-	char			**cmd;
+	char			**cmd_arr;
 	struct s_cmd	*next;
 	struct s_cmd	*start;
 }	t_cmd;
@@ -103,9 +106,12 @@ t_var	*var_addnode(t_sh *sh);
 // Misc utils
 void	free_str_arr(char **str_arr);
 
+// Pipe utils
+void	pipe_cleaner(t_sh *sh);
+
 #endif
 /* DUDAS
-Como reconocer comandos, y < > | u otros simbolos y no confundirlos con comandos,
+Como reconocer commandos, y < > | u otros simbolos y no confundirlos con commandos,
 entiendo que "< infile cmd1 | cm2 > outfile" infile se reconoce por que le precede
 < pero no conozco todas las posibilidades ni como de lioso se pues poner
 
