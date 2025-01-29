@@ -11,7 +11,10 @@ int	comand_builder(char *input, t_sh *sh)
 		if (sh->cmd_list->built_in)
 			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = ft_strdup(input);
 		else
+		{
+			printf("not built in\n");
 			sh->cmd_list->cmd[sh->cmd_list->cmd_count] = get_path(input);
+		}
 		add_galloc(sh->cmd_list->cmd[sh->cmd_list->cmd_count], sh);
 	}
 	else
@@ -174,7 +177,7 @@ void	parser(char **input_arr, t_sh *sh)
 	while (temp_cmd)
 	{
 		waitpid(temp_cmd->pid, &sh->last_comand, 0);
-		printf("%i\n", sh->last_comand);
+		//printf("%i\n", sh->last_comand);
 		temp_cmd = temp_cmd->next;
 	}
 }
