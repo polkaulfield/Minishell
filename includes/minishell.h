@@ -17,6 +17,7 @@
 # define SINGLE_REDIR 1
 # define DOUBLE_REDIR 2
 # define NO_REDIR 0
+# define RESET_COLOR "\033[0m"
 
 typedef struct	s_sh
 {
@@ -93,6 +94,7 @@ int		exec_built_in(t_sh *sh);
 void	find_built_in(char *input, t_sh *sh);
 void	cd(t_sh *sh);
 void	echo(t_sh *sh);
+void	export(t_sh *sh);
 void	executer_built_in(t_sh *sh);
 //cmd_utils.c
 t_cmd	*cmd_addnode(t_sh *sh);

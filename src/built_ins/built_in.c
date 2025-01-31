@@ -23,7 +23,7 @@ void	find_built_in(char *input, t_sh *sh)
 	else if (is_built_in(input, "pwd"))
 		;
 	else if (is_built_in(input, "export"))
-		;
+		set_main_process(sh);
 	else if (is_built_in(input, "unset"))
 		;
 	else if (is_built_in(input, "env"))
@@ -47,7 +47,7 @@ int	exec_built_in(t_sh *sh)
 	else if (is_built_in(cmd, "pwd"))
 		printf("pwd\n");
 	else if (is_built_in(cmd, "export"))
-		printf("export\n");
+		export(sh);
 	else if (is_built_in(cmd, "unset"))
 		printf("unset\n");
 	else if (is_built_in(cmd, "env"))
@@ -92,7 +92,7 @@ void	echo(t_sh *sh)
 
 	cmd = sh->cmd_list;
 	i = 0;
-	if (cmd->cmd_count != 1)
+	if (cmd->cmd_count == 1)
 		printf("\n");
 	if (ft_strncmp(cmd->cmd_arr[1], "-n", 3) == 0)
 		i++;
@@ -110,5 +110,9 @@ void	echo(t_sh *sh)
 
 void	export(t_sh *sh)
 {
+	char	**env_ptr;
 
+	env_ptr = sh->env;
+	while (*env_ptr)
+		printf("%s" RESET_COLOR "\n", *env_ptr++);
 }
